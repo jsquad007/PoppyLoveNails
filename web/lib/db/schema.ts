@@ -27,7 +27,7 @@ export const products = pgTable('products', {
   shapes:      text('shapes').array().notNull().default([]),
   // widths: xs | s | m | l
   widths:      text('widths').array().notNull().default([]),
-  // lengths: short | medium | long | extra_long
+  // lengths: extra_short | short | medium | long
   lengths:     text('lengths').array().notNull().default([]),
 
   stockCount:  integer('stock_count').notNull().default(0),
@@ -118,7 +118,7 @@ export const customCommissions = pgTable('custom_commissions', {
   id:               text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   orderId:          varchar('order_id', { length: 20 }).notNull().references(() => orders.id),
   nailShape:        text('nail_shape').notNull(), // almond | coffin | stiletto | oval | square | squoval
-  nailLength:       text('nail_length').notNull(), // short | medium | long | extra_long
+  nailLength:       text('nail_length').notNull(), // extra_short | short | medium | long
   nailWidth:        text('nail_width').notNull(),  // xs | s | m | l
   referenceImages:  text('reference_images').array().notNull().default([]),
   description:      text('description'),

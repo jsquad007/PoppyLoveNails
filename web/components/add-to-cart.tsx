@@ -21,10 +21,10 @@ const WIDTH_LABELS: Record<string, string> = {
 }
 
 const LENGTH_LABELS: Record<string, string> = {
-  short:      'Short',
-  medium:     'Medium',
-  long:       'Long',
-  extra_long: 'Extra Long',
+  extra_short: 'Extra Short',
+  short:       'Short',
+  medium:      'Medium',
+  long:        'Long',
 }
 
 export default function AddToCart({ product }: { product: Product }) {

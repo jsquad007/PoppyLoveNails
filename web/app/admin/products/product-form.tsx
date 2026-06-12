@@ -33,10 +33,10 @@ const WIDTHS = [
 ]
 
 const LENGTHS = [
-  { value: 'short',      label: 'Short' },
-  { value: 'medium',     label: 'Medium' },
-  { value: 'long',       label: 'Long' },
-  { value: 'extra_long', label: 'Extra Long' },
+  { value: 'extra_short', label: 'Extra Short' },
+  { value: 'short',       label: 'Short' },
+  { value: 'medium',      label: 'Medium' },
+  { value: 'long',        label: 'Long' },
 ]
 
 export default function ProductForm({
