@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { addToCart, formatAUD } from '@/lib/cart'
 import type { Product } from '@/lib/db/queries'
 
@@ -48,7 +48,17 @@ export default function AddToCart({ product }: { product: Product }) {
       setSelectedLength(null)
     }
   }
-  const [added, setAdded] = useState(false)
+  const [added,          setAdded]          = useState(false)
+  const [shapeGuideOpen, setShapeGuideOpen] = useState(false)
+
+  const closeShapeGuide = useCallback(() => setShapeGuideOpen(false), [])
+
+  useEffect(() => {
+    if (!shapeGuideOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeShapeGuide() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [shapeGuideOpen, closeShapeGuide])
 
   const isOutOfStock = product.stockCount === 0
   const allSelected  = selectedShape && selectedWidth && selectedLength
@@ -75,7 +85,16 @@ export default function AddToCart({ product }: { product: Product }) {
       {/* Shape */}
       {product.shapes.length > 0 && (
         <div className="space-y-3">
-          <p className="type-label-sm text-[var(--color-primary)]">Nail Shape</p>
+          <div className="flex items-center gap-3">
+            <p className="type-label-sm text-[var(--color-primary)]">Nail Shape</p>
+            <button
+              type="button"
+              onClick={() => setShapeGuideOpen(true)}
+              className="type-label-sm text-[var(--color-outline)] underline underline-offset-2 hover:text-[var(--color-primary)] transition-colors"
+            >
+              Shape Guide
+            </button>
+          </div>
           <div className="flex flex-wrap gap-3">
             {product.shapes.map((s) => (
               <button
@@ -181,6 +200,28 @@ export default function AddToCart({ product }: { product: Product }) {
       >
         Add to Wishlist
       </button>
+
+      {/* Shape Guide Modal */}
+      {shapeGuideOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={closeShapeGuide}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/80 hover:text-white text-3xl leading-none"
+            onClick={closeShapeGuide}
+            aria-label="Close"
+          >
+            ×
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/nail-shape-guide.png"
+            alt="Nail shape guide"
+            className="max-w-[90vw] max-h-[90vh] object-contain"
+          />
+        </div>
+      )}
     </div>
   )
 }
