@@ -132,6 +132,35 @@ export default function CommissionForm({
             <legend className="type-headline-md text-[var(--color-primary)] mb-8">
               2. Choose your length
             </legend>
+
+            {/* Length reference table */}
+            <div className="gallery-frame mb-6 overflow-x-auto">
+              <table className="w-full text-center type-label-sm text-[var(--color-on-surface-variant)]">
+                <thead>
+                  <tr className="border-b border-[var(--color-outline-variant)]">
+                    {['Length','Almond','Coffin','Oval','Stiletto','Square','Squoval'].map((h) => (
+                      <th key={h} className="px-3 py-2 type-label-sm text-[var(--color-primary)] font-semibold whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['Extra Short', '20.1–20.7 mm', '16.5–17.5 mm', '17.0–19.0 mm', '',             '16.5–19.0 mm', '15.2–17.7 mm'],
+                    ['Short',       '22.9–23.6 mm', '19.5–21.5 mm', '19.2–20.1 mm', '21.0–22.0 mm', '20.0–23.7 mm', ''],
+                    ['Medium',      '24.6–25.2 mm', '24.4–25.4 mm', '21.0–22.5 mm', '28.0–29.0 mm', '24.0–25.0 mm', ''],
+                    ['Long',        '',             '29.5–31.0 mm', '',             '32.5–33.5 mm', '',             ''],
+                  ].map(([label, ...cells]) => (
+                    <tr key={label} className="border-b border-[var(--color-outline-variant)] last:border-0">
+                      <td className="px-3 py-2 text-[var(--color-primary)] font-medium whitespace-nowrap">{label}</td>
+                      {cells.map((cell, i) => (
+                        <td key={i} className="px-3 py-2 whitespace-nowrap">{cell || '—'}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
             <div className="flex flex-wrap gap-4">
               {LENGTHS.map((l) => {
                 const active = selectedLength === l.value
