@@ -20,6 +20,16 @@ const LENGTHS = [
   { value: 'long',        label: 'Long' },
 ]
 
+// Which lengths are available per shape (derived from the length reference table)
+const SHAPE_LENGTHS: Record<string, string[]> = {
+  almond:   ['extra_short', 'short', 'medium'],
+  coffin:   ['extra_short', 'short', 'medium', 'long'],
+  oval:     ['extra_short', 'short', 'medium'],
+  stiletto: ['short', 'medium', 'long'],
+  square:   ['extra_short', 'short', 'medium'],
+  squoval:  ['extra_short'],
+}
+
 const WIDTHS = [
   { value: 'xs', label: 'XS' },
   { value: 's',  label: 'S' },
@@ -41,6 +51,14 @@ export default function CommissionForm({
 }) {
   const [selectedShape,  setSelectedShape]  = useState<string>('almond')
   const [selectedLength, setSelectedLength] = useState<string>('medium')
+
+  function handleShapeChange(shape: string) {
+    setSelectedShape(shape)
+    const available = SHAPE_LENGTHS[shape] ?? []
+    if (!available.includes(selectedLength)) {
+      setSelectedLength(available[0] ?? '')
+    }
+  }
   const [selectedWidth,  setSelectedWidth]  = useState<string>('m')
   const [fileNames,      setFileNames]      = useState<string[]>([])
   const [fileError,      setFileError]      = useState<string | null>(null)
@@ -98,7 +116,7 @@ export default function CommissionForm({
                   <button
                     key={s.value}
                     type="button"
-                    onClick={() => setSelectedShape(s.value)}
+                    onClick={() => handleShapeChange(s.value)}
                     className={`gallery-frame flex flex-col items-center gap-4 cursor-pointer transition-all duration-200 ${
                       active
                         ? 'border-[var(--color-primary)] bg-[var(--color-surface-low)]'
@@ -138,17 +156,17 @@ export default function CommissionForm({
               <table className="w-full text-center type-label-sm text-[var(--color-on-surface-variant)]">
                 <thead>
                   <tr className="border-b border-[var(--color-outline-variant)]">
-                    {['Length','Almond','Coffin','Oval','Stiletto','Square','Squoval'].map((h) => (
+                    {['Length (mm)','Almond','Coffin','Oval','Stiletto','Square','Squoval'].map((h) => (
                       <th key={h} className="px-3 py-2 type-label-sm text-[var(--color-primary)] font-semibold whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    ['Extra Short', '20.1–20.7 mm', '16.5–17.5 mm', '17.0–19.0 mm', '',             '16.5–19.0 mm', '15.2–17.7 mm'],
-                    ['Short',       '22.9–23.6 mm', '19.5–21.5 mm', '19.2–20.1 mm', '21.0–22.0 mm', '20.0–23.7 mm', ''],
-                    ['Medium',      '24.6–25.2 mm', '24.4–25.4 mm', '21.0–22.5 mm', '28.0–29.0 mm', '24.0–25.0 mm', ''],
-                    ['Long',        '',             '29.5–31.0 mm', '',             '32.5–33.5 mm', '',             ''],
+                    ['Extra Short', '20.1-20.7', '16.5-17.5', '17.0-19.0', '',           '16.5-19.0', '15.2-17.7'],
+                    ['Short',       '22.9-23.6', '19.5-21.5', '19.2-20.1', '21.0-22.0', '20.0-23.7', ''],
+                    ['Medium',      '24.6-25.2', '24.4-25.4', '21.0-22.5', '28.0-29.0', '24.0-25.0', ''],
+                    ['Long',        '',          '29.5-31.0', '',          '32.5-33.5',  '',          ''],
                   ].map(([label, ...cells]) => (
                     <tr key={label} className="border-b border-[var(--color-outline-variant)] last:border-0">
                       <td className="px-3 py-2 text-[var(--color-primary)] font-medium whitespace-nowrap">{label}</td>
@@ -163,14 +181,18 @@ export default function CommissionForm({
 
             <div className="flex flex-wrap gap-4">
               {LENGTHS.map((l) => {
-                const active = selectedLength === l.value
+                const active    = selectedLength === l.value
+                const available = (SHAPE_LENGTHS[selectedShape] ?? []).includes(l.value)
                 return (
                   <button
                     key={l.value}
                     type="button"
-                    onClick={() => setSelectedLength(l.value)}
+                    disabled={!available}
+                    onClick={() => available && setSelectedLength(l.value)}
                     className={`px-8 py-4 border type-label-md uppercase tracking-widest transition-all duration-200 ${
-                      active
+                      !available
+                        ? 'border-[var(--color-outline-variant)] text-[var(--color-outline)] opacity-35 cursor-not-allowed'
+                        : active
                         ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-on-primary)]'
                         : 'border-[var(--color-outline-variant)] text-[var(--color-on-surface-variant)] hover:border-[var(--color-primary)]'
                     }`}
