@@ -51,9 +51,11 @@ export default function AddToCart({ product }: { product: Product }) {
   const [added,           setAdded]           = useState(false)
   const [shapeGuideOpen,  setShapeGuideOpen]  = useState(false)
   const [lengthGuideOpen, setLengthGuideOpen] = useState(false)
+  const [widthGuideOpen,  setWidthGuideOpen]  = useState(false)
 
   const closeShapeGuide  = useCallback(() => setShapeGuideOpen(false),  [])
   const closeLengthGuide = useCallback(() => setLengthGuideOpen(false), [])
+  const closeWidthGuide  = useCallback(() => setWidthGuideOpen(false),  [])
 
   useEffect(() => {
     if (!shapeGuideOpen) return
@@ -68,6 +70,13 @@ export default function AddToCart({ product }: { product: Product }) {
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [lengthGuideOpen, closeLengthGuide])
+
+  useEffect(() => {
+    if (!widthGuideOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeWidthGuide() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [widthGuideOpen, closeWidthGuide])
 
   const isOutOfStock = product.stockCount === 0
   const allSelected  = selectedShape && selectedWidth && selectedLength
@@ -125,7 +134,16 @@ export default function AddToCart({ product }: { product: Product }) {
       {/* Width */}
       {product.widths.length > 0 && (
         <div className="space-y-3">
-          <p className="type-label-sm text-[var(--color-primary)]">Nail Width</p>
+          <div className="flex items-center gap-3">
+            <p className="type-label-sm text-[var(--color-primary)]">Nail Width</p>
+            <button
+              type="button"
+              onClick={() => setWidthGuideOpen(true)}
+              className="type-label-sm text-[var(--color-outline)] underline underline-offset-2 hover:text-[var(--color-primary)] transition-colors"
+            >
+              Width Guide
+            </button>
+          </div>
           <div className="flex flex-wrap gap-2">
             {product.widths.map((w) => (
               <button
@@ -212,6 +230,71 @@ export default function AddToCart({ product }: { product: Product }) {
       >
         Add to Wishlist
       </button>
+
+      {/* Width Guide Modal */}
+      {widthGuideOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"
+          onClick={closeWidthGuide}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/80 hover:text-white text-3xl leading-none"
+            onClick={closeWidthGuide}
+            aria-label="Close"
+          >
+            ×
+          </button>
+          <div
+            className="bg-[var(--color-surface)] p-6 max-w-2xl w-full space-y-6 overflow-y-auto max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Measurement image */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/nail-measurement-guide.png"
+              alt="Nail measurement guide"
+              className="w-full h-auto"
+            />
+
+            {/* Width chart */}
+            <div>
+              <p className="type-headline-md text-[var(--color-primary)] text-center mb-4">Width Chart</p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-center type-label-sm text-[var(--color-on-surface-variant)]">
+                  <thead>
+                    <tr>
+                      <th className="pb-1 px-3 text-right" colSpan={6}>
+                        <span className="type-label-sm text-[var(--color-outline)]">「mm」</span>
+                      </th>
+                    </tr>
+                    <tr className="border-b border-[var(--color-outline-variant)]">
+                      <th className="py-2 px-3 text-left"></th>
+                      {['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'].map((h) => (
+                        <th key={h} className="py-2 px-3 text-[var(--color-primary)] font-semibold">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { size: 'XS', widths: [14, 10, 11, 10, 7]  },
+                      { size: 'S',  widths: [15, 11, 12, 11, 8]  },
+                      { size: 'M',  widths: [16, 12, 13, 12, 9]  },
+                      { size: 'L',  widths: [17, 13, 14, 13, 10] },
+                    ].map((row) => (
+                      <tr key={row.size} className="border-b border-[var(--color-outline-variant)] last:border-0">
+                        <td className="py-2 px-3 type-label-md text-[var(--color-primary)] text-left font-medium">{row.size}</td>
+                        {row.widths.map((w, i) => (
+                          <td key={i} className="py-2 px-3">{w}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Length Guide Modal */}
       {lengthGuideOpen && (
