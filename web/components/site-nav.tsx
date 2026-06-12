@@ -75,7 +75,7 @@ export default function SiteNav() {
           </Link>
 
           <Link
-            href="/faq"
+            href="/about"
             className="type-label-md text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)] transition-colors"
           >
             About Us
@@ -105,7 +105,7 @@ export default function SiteNav() {
       <div className="md:hidden border-t border-[var(--color-outline-variant)] px-[var(--spacing-margin-mobile)] py-4 flex flex-col gap-4 hidden">
         <Link href="/shop"            className="type-label-md text-[var(--color-on-surface-variant)]">Shop</Link>
         <Link href="/design-your-own" className="type-label-md text-[var(--color-on-surface-variant)]">Design Your Own</Link>
-        <Link href="/faq"             className="type-label-md text-[var(--color-on-surface-variant)]">About Us</Link>
+        <Link href="/about"           className="type-label-md text-[var(--color-on-surface-variant)]">About Us</Link>
       </div>
     </header>
   )
