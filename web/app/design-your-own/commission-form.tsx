@@ -172,7 +172,7 @@ export default function CommissionForm({
 
             {/* Size reference table */}
             <div className="gallery-frame mb-6 overflow-x-auto">
-              <p className="type-headline-md text-[var(--color-primary)] text-center mb-4">Size Chart</p>
+              <p className="type-headline-md text-[var(--color-primary)] text-center mb-4">Width Chart</p>
               <table className="w-full text-center type-label-sm text-[var(--color-on-surface-variant)]">
                 <thead>
                   <tr>

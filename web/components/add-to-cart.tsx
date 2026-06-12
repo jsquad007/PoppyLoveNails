@@ -59,7 +59,7 @@ export default function AddToCart({ product }: { product: Product }) {
       {product.shapes.length > 0 && (
         <div className="space-y-3">
           <p className="type-label-sm text-[var(--color-primary)]">Nail Shape</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {product.shapes.map((s) => (
               <button
                 key={s}
