@@ -48,10 +48,12 @@ export default function AddToCart({ product }: { product: Product }) {
       setSelectedLength(null)
     }
   }
-  const [added,          setAdded]          = useState(false)
-  const [shapeGuideOpen, setShapeGuideOpen] = useState(false)
+  const [added,           setAdded]           = useState(false)
+  const [shapeGuideOpen,  setShapeGuideOpen]  = useState(false)
+  const [lengthGuideOpen, setLengthGuideOpen] = useState(false)
 
-  const closeShapeGuide = useCallback(() => setShapeGuideOpen(false), [])
+  const closeShapeGuide  = useCallback(() => setShapeGuideOpen(false),  [])
+  const closeLengthGuide = useCallback(() => setLengthGuideOpen(false), [])
 
   useEffect(() => {
     if (!shapeGuideOpen) return
@@ -59,6 +61,13 @@ export default function AddToCart({ product }: { product: Product }) {
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [shapeGuideOpen, closeShapeGuide])
+
+  useEffect(() => {
+    if (!lengthGuideOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeLengthGuide() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [lengthGuideOpen, closeLengthGuide])
 
   const isOutOfStock = product.stockCount === 0
   const allSelected  = selectedShape && selectedWidth && selectedLength
@@ -132,19 +141,22 @@ export default function AddToCart({ product }: { product: Product }) {
               </button>
             ))}
           </div>
-          <a
-            href="/faq#size-guide"
-            className="type-label-sm text-[var(--color-outline)] underline underline-offset-2 hover:text-[var(--color-primary)] transition-colors"
-          >
-            Size Guide
-          </a>
         </div>
       )}
 
       {/* Length */}
       {product.lengths.length > 0 && (
         <div className="space-y-3">
-          <p className="type-label-sm text-[var(--color-primary)]">Nail Length</p>
+          <div className="flex items-center gap-3">
+            <p className="type-label-sm text-[var(--color-primary)]">Nail Length</p>
+            <button
+              type="button"
+              onClick={() => setLengthGuideOpen(true)}
+              className="type-label-sm text-[var(--color-outline)] underline underline-offset-2 hover:text-[var(--color-primary)] transition-colors"
+            >
+              Length Guide
+            </button>
+          </div>
           <div className="flex flex-wrap gap-2">
             {product.lengths.map((l) => {
               const available = !selectedShape || (SHAPE_LENGTHS[selectedShape] ?? []).includes(l)
@@ -200,6 +212,52 @@ export default function AddToCart({ product }: { product: Product }) {
       >
         Add to Wishlist
       </button>
+
+      {/* Length Guide Modal */}
+      {lengthGuideOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"
+          onClick={closeLengthGuide}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/80 hover:text-white text-3xl leading-none"
+            onClick={closeLengthGuide}
+            aria-label="Close"
+          >
+            ×
+          </button>
+          <div
+            className="bg-[var(--color-surface)] p-6 max-w-2xl w-full overflow-x-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="type-headline-md text-[var(--color-primary)] text-center mb-4">Length Guide</p>
+            <table className="w-full text-center type-label-sm text-[var(--color-on-surface-variant)]">
+              <thead>
+                <tr className="border-b border-[var(--color-outline-variant)]">
+                  {['Length (mm)', 'Almond', 'Coffin', 'Oval', 'Stiletto', 'Square', 'Squoval'].map((h) => (
+                    <th key={h} className="px-3 py-2 text-[var(--color-primary)] font-semibold whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['Extra Short', '20.1-20.7', '16.5-17.5', '17.0-19.0', '',           '16.5-19.0', '15.2-17.7'],
+                  ['Short',       '22.9-23.6', '19.5-21.5', '19.2-20.1', '21.0-22.0', '20.0-23.7', ''],
+                  ['Medium',      '24.6-25.2', '24.4-25.4', '21.0-22.5', '28.0-29.0', '24.0-25.0', ''],
+                  ['Long',        '',          '29.5-31.0', '',          '32.5-33.5',  '',          ''],
+                ].map(([label, ...cells]) => (
+                  <tr key={label} className="border-b border-[var(--color-outline-variant)] last:border-0">
+                    <td className="px-3 py-2 text-[var(--color-primary)] font-medium whitespace-nowrap">{label}</td>
+                    {cells.map((cell, i) => (
+                      <td key={i} className="px-3 py-2 whitespace-nowrap">{cell || '—'}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Shape Guide Modal */}
       {shapeGuideOpen && (
