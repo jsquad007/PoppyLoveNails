@@ -40,7 +40,7 @@ export async function createProduct(formData: FormData) {
   const imageUrls: string[] = []
   for (const file of files) {
     if (file.size === 0) continue
-    const blob = await put(`products/${sku}/${file.name}`, file, { access: 'public' })
+    const blob = await put(`products/${sku}/${file.name}`, file, { access: 'public', addRandomSuffix: true })
     imageUrls.push(blob.url)
   }
 
@@ -85,7 +85,7 @@ export async function updateProduct(id: string, formData: FormData) {
   const newImageUrls: string[] = []
   for (const file of files) {
     if (file.size === 0) continue
-    const blob = await put(`products/${sku}/${file.name}`, file, { access: 'public' })
+    const blob = await put(`products/${sku}/${file.name}`, file, { access: 'public', addRandomSuffix: true })
     newImageUrls.push(blob.url)
   }
 

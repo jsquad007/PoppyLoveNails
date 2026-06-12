@@ -79,15 +79,12 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
             ×
           </button>
 
-          <div className="relative max-w-[90vw] max-h-[90vh] w-full h-full">
-            <Image
-              src={lightboxSrc}
-              alt={productName}
-              fill
-              className="object-contain"
-              sizes="90vw"
-            />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={lightboxSrc}
+            alt={productName}
+            className="max-w-[90vw] max-h-[90vh] object-contain"
+          />
         </div>
       )}
     </>

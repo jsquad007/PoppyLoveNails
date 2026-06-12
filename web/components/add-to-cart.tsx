@@ -27,10 +27,27 @@ const LENGTH_LABELS: Record<string, string> = {
   long:        'Long',
 }
 
+const SHAPE_LENGTHS: Record<string, string[]> = {
+  almond:   ['extra_short', 'short', 'medium'],
+  coffin:   ['extra_short', 'short', 'medium', 'long'],
+  oval:     ['extra_short', 'short', 'medium'],
+  stiletto: ['short', 'medium', 'long'],
+  square:   ['extra_short', 'short', 'medium'],
+  squoval:  ['extra_short'],
+}
+
 export default function AddToCart({ product }: { product: Product }) {
   const [selectedShape,  setSelectedShape]  = useState<string | null>(null)
   const [selectedWidth,  setSelectedWidth]  = useState<string | null>(null)
   const [selectedLength, setSelectedLength] = useState<string | null>(null)
+
+  function handleShapeChange(shape: string) {
+    setSelectedShape(shape)
+    const available = SHAPE_LENGTHS[shape] ?? []
+    if (selectedLength && !available.includes(selectedLength)) {
+      setSelectedLength(null)
+    }
+  }
   const [added, setAdded] = useState(false)
 
   const isOutOfStock = product.stockCount === 0
@@ -63,7 +80,7 @@ export default function AddToCart({ product }: { product: Product }) {
             {product.shapes.map((s) => (
               <button
                 key={s}
-                onClick={() => setSelectedShape(s)}
+                onClick={() => handleShapeChange(s)}
                 className={`px-4 py-2 border type-label-sm transition-colors ${
                   selectedShape === s
                     ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] border-[var(--color-primary)]'
@@ -110,19 +127,25 @@ export default function AddToCart({ product }: { product: Product }) {
         <div className="space-y-3">
           <p className="type-label-sm text-[var(--color-primary)]">Nail Length</p>
           <div className="flex flex-wrap gap-2">
-            {product.lengths.map((l) => (
-              <button
-                key={l}
-                onClick={() => setSelectedLength(l)}
-                className={`px-4 py-2 border type-label-sm transition-colors ${
-                  selectedLength === l
-                    ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] border-[var(--color-primary)]'
-                    : 'border-[var(--color-outline-variant)] text-[var(--color-on-surface-variant)] hover:border-[var(--color-primary)]'
-                }`}
-              >
-                {LENGTH_LABELS[l] ?? l}
-              </button>
-            ))}
+            {product.lengths.map((l) => {
+              const available = !selectedShape || (SHAPE_LENGTHS[selectedShape] ?? []).includes(l)
+              return (
+                <button
+                  key={l}
+                  disabled={!available}
+                  onClick={() => available && setSelectedLength(l)}
+                  className={`px-4 py-2 border type-label-sm transition-colors ${
+                    !available
+                      ? 'border-[var(--color-outline-variant)] text-[var(--color-outline)] opacity-35 cursor-not-allowed'
+                      : selectedLength === l
+                      ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] border-[var(--color-primary)]'
+                      : 'border-[var(--color-outline-variant)] text-[var(--color-on-surface-variant)] hover:border-[var(--color-primary)]'
+                  }`}
+                >
+                  {LENGTH_LABELS[l] ?? l}
+                </button>
+              )
+            })}
           </div>
         </div>
       )}

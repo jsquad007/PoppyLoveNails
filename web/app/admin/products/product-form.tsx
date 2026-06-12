@@ -39,6 +39,21 @@ const LENGTHS = [
   { value: 'long',        label: 'Long' },
 ]
 
+const SHAPE_LENGTHS: Record<string, string[]> = {
+  almond:   ['extra_short', 'short', 'medium'],
+  coffin:   ['extra_short', 'short', 'medium', 'long'],
+  oval:     ['extra_short', 'short', 'medium'],
+  stiletto: ['short', 'medium', 'long'],
+  square:   ['extra_short', 'short', 'medium'],
+  squoval:  ['extra_short'],
+}
+
+function availableLengthsFor(shapes: string[]): string[] {
+  if (shapes.length === 0) return LENGTHS.map((l) => l.value)
+  const set = new Set(shapes.flatMap((s) => SHAPE_LENGTHS[s] ?? []))
+  return LENGTHS.map((l) => l.value).filter((l) => set.has(l))
+}
+
 export default function ProductForm({
   product,
   action,
@@ -48,7 +63,20 @@ export default function ProductForm({
 }) {
   const formRef     = useRef<HTMLFormElement>(null)
   const isEdit      = !!product
-  const [imageError, setImageError] = useState<string | null>(null)
+  const [imageError,      setImageError]      = useState<string | null>(null)
+  const [selectedShapes,  setSelectedShapes]  = useState<string[]>(product?.shapes  ?? [])
+  const [selectedLengths, setSelectedLengths] = useState<string[]>(product?.lengths ?? [])
+
+  function handleShapeChange(value: string, checked: boolean) {
+    const next = checked ? [...selectedShapes, value] : selectedShapes.filter((s) => s !== value)
+    setSelectedShapes(next)
+    const available = availableLengthsFor(next)
+    setSelectedLengths((prev) => prev.filter((l) => available.includes(l)))
+  }
+
+  function handleLengthChange(value: string, checked: boolean) {
+    setSelectedLengths(checked ? [...selectedLengths, value] : selectedLengths.filter((l) => l !== value))
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     setImageError(null)
@@ -148,7 +176,8 @@ export default function ProductForm({
         <CheckboxGroup
           name="shapes"
           options={SHAPES}
-          selected={product?.shapes ?? []}
+          selected={selectedShapes}
+          onChange={handleShapeChange}
         />
       </Field>
 
@@ -162,11 +191,13 @@ export default function ProductForm({
       </Field>
 
       {/* Lengths */}
-      <Field label="Available Lengths">
+      <Field label="Available Lengths" hint="Only lengths valid for the selected shapes are enabled">
         <CheckboxGroup
           name="lengths"
           options={LENGTHS}
-          selected={product?.lengths ?? []}
+          selected={selectedLengths}
+          onChange={handleLengthChange}
+          disabled={LENGTHS.map((l) => l.value).filter((l) => !availableLengthsFor(selectedShapes).includes(l))}
         />
       </Field>
 
@@ -250,28 +281,48 @@ function CheckboxGroup({
   name,
   options,
   selected,
+  onChange,
+  disabled = [],
 }: {
-  name:     string
-  options:  { value: string; label: string }[]
-  selected: string[]
+  name:      string
+  options:   { value: string; label: string }[]
+  selected:  string[]
+  onChange?: (value: string, checked: boolean) => void
+  disabled?: string[]
 }) {
   return (
     <div className="flex flex-wrap gap-2">
-      {options.map((opt) => (
-        <label
-          key={opt.value}
-          className="flex items-center gap-2 px-4 py-2 border border-[var(--color-outline-variant)] cursor-pointer hover:border-[var(--color-primary)] transition-colors has-[:checked]:bg-[var(--color-primary)] has-[:checked]:border-[var(--color-primary)] has-[:checked]:text-[var(--color-on-primary)]"
-        >
-          <input
-            type="checkbox"
-            name={name}
-            value={opt.value}
-            defaultChecked={selected.includes(opt.value)}
-            className="sr-only"
-          />
-          <span className="type-label-sm">{opt.label}</span>
-        </label>
-      ))}
+      {options.map((opt) => {
+        const isDisabled = disabled.includes(opt.value)
+        const isChecked  = selected.includes(opt.value)
+        return (
+          <label
+            key={opt.value}
+            className={`flex items-center gap-2 px-4 py-2 border transition-colors ${
+              isDisabled
+                ? 'border-[var(--color-outline-variant)] text-[var(--color-outline)] opacity-35 cursor-not-allowed'
+                : onChange
+                ? isChecked
+                  ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-on-primary)] cursor-pointer'
+                  : 'border-[var(--color-outline-variant)] cursor-pointer hover:border-[var(--color-primary)]'
+                : 'border-[var(--color-outline-variant)] cursor-pointer hover:border-[var(--color-primary)] has-[:checked]:bg-[var(--color-primary)] has-[:checked]:border-[var(--color-primary)] has-[:checked]:text-[var(--color-on-primary)]'
+            }`}
+          >
+            <input
+              type="checkbox"
+              name={name}
+              value={opt.value}
+              disabled={isDisabled}
+              {...(onChange
+                ? { checked: isChecked, onChange: (e) => onChange(opt.value, e.target.checked) }
+                : { defaultChecked: isChecked }
+              )}
+              className="sr-only"
+            />
+            <span className="type-label-sm">{opt.label}</span>
+          </label>
+        )
+      })}
     </div>
   )
 }
