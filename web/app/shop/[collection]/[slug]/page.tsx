@@ -134,7 +134,7 @@ export default async function ProductDetailPage(props: {
           {/* Accordions */}
           <Accordion title="What's Included">
             <p className="type-body-md text-[var(--color-on-surface-variant)]">
-              Each set includes 10–12 hand-painted press-on nails, a mini nail file, cuticle stick, alcohol prep pad, and adhesive tabs. Optional nail glue available on request.
+              Each set includes 10 hand-painted press-on nails, a mini nail file, cuticle stick, and adhesive tabs.
             </p>
           </Accordion>
 
