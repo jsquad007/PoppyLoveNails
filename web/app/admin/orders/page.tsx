@@ -1,13 +1,13 @@
 import { getOrders, getOrderStats } from '@/lib/db/queries'
 import { formatAUD } from '@/lib/cart'
 import OrderStatusSelect from './order-status-select'
+import TrackingNumberInput from './tracking-number-input'
 
 const STATUS_STYLES: Record<string, string> = {
   new_request:      'bg-[var(--color-surface-highest)] text-[var(--color-on-surface-variant)]',
   awaiting_payment: 'bg-[#fef3c7] text-[#92400e]',
   in_production:    'bg-[var(--color-primary)] text-[var(--color-on-primary)]',
   shipped:          'bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)]',
-  delivered:        'bg-[#d1fae5] text-[#065f46]',
   cancelled:        'bg-[var(--color-error-container)] text-[var(--color-on-error-container)]',
 }
 
@@ -16,7 +16,6 @@ const STATUS_LABELS: Record<string, string> = {
   awaiting_payment: 'Awaiting Payment',
   in_production:    'In Production',
   shipped:          'Shipped',
-  delivered:        'Delivered',
   cancelled:        'Cancelled',
 }
 
@@ -61,11 +60,11 @@ export default async function AdminOrdersPage({
       <div className="flex flex-wrap gap-2 mb-6">
         {[
           { label: 'All Statuses',   value: undefined },
-          { label: 'New Request',    value: 'new_request' },
-          { label: 'In Production',  value: 'in_production' },
-          { label: 'Shipped',        value: 'shipped' },
-          { label: 'Delivered',      value: 'delivered' },
-          { label: 'Cancelled',      value: 'cancelled' },
+          { label: 'New Request',      value: 'new_request' },
+          { label: 'Awaiting Payment', value: 'awaiting_payment' },
+          { label: 'In Production',    value: 'in_production' },
+          { label: 'Shipped',          value: 'shipped' },
+          { label: 'Cancelled',        value: 'cancelled' },
         ].map((f) => {
           const isActive = (status ?? undefined) === f.value
           return (
@@ -107,30 +106,43 @@ export default async function AdminOrdersPage({
             return (
               <div
                 key={order.id}
-                className="grid grid-cols-[1fr_2fr_2fr_1fr_1.5fr_1fr] gap-4 px-6 py-4 border-b border-[var(--color-outline-variant)] last:border-b-0 items-center hover:bg-[var(--color-surface-low)] transition-colors"
+                className="px-6 py-4 border-b border-[var(--color-outline-variant)] last:border-b-0 hover:bg-[var(--color-surface-low)] transition-colors space-y-3"
               >
-                <span className="type-label-sm text-[var(--color-outline)]">#{order.id}</span>
+                {/* Main row */}
+                <div className="grid grid-cols-[1fr_2fr_2fr_1fr_1.5fr_1fr] gap-4 items-center">
+                  <span className="type-label-sm text-[var(--color-outline)]">#{order.id}</span>
 
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[var(--color-secondary-container)] flex items-center justify-center shrink-0">
-                    <span className="type-label-sm text-[var(--color-on-secondary-container)]">
-                      {order.customerName.slice(0, 2).toUpperCase()}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-secondary-container)] flex items-center justify-center shrink-0">
+                      <span className="type-label-sm text-[var(--color-on-secondary-container)]">
+                        {order.customerName.slice(0, 2).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="type-body-md text-[var(--color-on-surface)] truncate">{order.customerName}</span>
                   </div>
-                  <span className="type-body-md text-[var(--color-on-surface)] truncate">{order.customerName}</span>
+
+                  <span className="type-body-md text-[var(--color-on-surface-variant)] truncate">{productSummary}</span>
+
+                  <span className="type-label-sm text-[var(--color-outline)]">
+                    {new Date(order.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+
+                  <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+
+                  <span className="type-label-md text-[var(--color-on-surface)]">
+                    {formatAUD(order.totalAmount)}
+                  </span>
                 </div>
 
-                <span className="type-body-md text-[var(--color-on-surface-variant)] truncate">{productSummary}</span>
-
-                <span className="type-label-sm text-[var(--color-outline)]">
-                  {new Date(order.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
-
-                <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
-
-                <span className="type-label-md text-[var(--color-on-surface)]">
-                  {formatAUD(order.totalAmount)}
-                </span>
+                {/* Tracking row — only shown when shipped */}
+                {order.status === 'shipped' && (
+                  <div className="flex items-center gap-3">
+                    <span className="type-label-sm text-[var(--color-outline)] w-24 shrink-0">Tracking</span>
+                    <div className="flex-1 max-w-sm">
+                      <TrackingNumberInput orderId={order.id} currentTracking={order.auspostTrackingNumber ?? null} />
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })

@@ -62,6 +62,14 @@ export async function getOrderById(id: string): Promise<Order | null> {
   return order ?? null
 }
 
+export async function getOrdersByUser(userId: string): Promise<Order[]> {
+  return db
+    .select()
+    .from(orders)
+    .where(eq(orders.userId, userId))
+    .orderBy(desc(orders.createdAt))
+}
+
 export async function getOrderStats(): Promise<{ newRequests: number; inProduction: number }> {
   const [newReqs] = await db
     .select({ value: count() })

@@ -8,7 +8,6 @@ const STATUSES = [
   { value: 'awaiting_payment', label: 'Awaiting Payment' },
   { value: 'in_production',    label: 'In Production' },
   { value: 'shipped',          label: 'Shipped' },
-  { value: 'delivered',        label: 'Delivered' },
   { value: 'cancelled',        label: 'Cancelled' },
 ]
 
