@@ -79,11 +79,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
             ×
           </button>
 
-          {/* Image container — stop propagation so clicking the image doesn't close */}
-          <div
-            className="relative max-w-[90vw] max-h-[90vh] w-full h-full"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="relative max-w-[90vw] max-h-[90vh] w-full h-full">
             <Image
               src={lightboxSrc}
               alt={productName}
