@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Environment variables (contain secrets)
+.env
+.env.local
+.env*.local
+
+# Drizzle migrations output
+web/drizzle/
+
+# Temporary / scratch
+.tmp/
+temp_zip_contents/
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+*~
