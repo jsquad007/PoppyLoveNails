@@ -1,10 +1,10 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductBySku } from '@/lib/db/queries'
 import { formatAUD } from '@/lib/cart'
 import AddToCart from '@/components/add-to-cart'
 import { slugToCollection } from '@/components/product-card'
+import ImageGallery from '@/components/image-gallery'
 
 const COLLECTION_LABELS: Record<string, string> = {
   floral:           'Floral',
@@ -53,40 +53,7 @@ export default async function ProductDetailPage(props: {
 
         {/* ── Left: Images ──────────────────────────────────────────── */}
         <div className="space-y-4">
-          {/* Main image */}
-          <div className="gallery-frame aspect-square relative overflow-hidden">
-            {product.images.length > 0 ? (
-              <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-[var(--color-surface-high)]">
-                <span className="type-label-sm text-[var(--color-outline)]">No image</span>
-              </div>
-            )}
-          </div>
-
-          {/* Thumbnails */}
-          {product.images.length > 1 && (
-            <div className="grid grid-cols-3 gap-3">
-              {product.images.slice(1, 4).map((src, i) => (
-                <div key={i} className="gallery-frame aspect-square relative overflow-hidden">
-                  <Image
-                    src={src}
-                    alt={`${product.name} view ${i + 2}`}
-                    fill
-                    className="object-cover"
-                    sizes="20vw"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          <ImageGallery images={product.images} productName={product.name} />
         </div>
 
         {/* ── Right: Details ────────────────────────────────────────── */}
