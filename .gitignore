@@ -26,3 +26,17 @@ Thumbs.db
 .vscode/
 *.swp
 *~
+
+# CLAUDE.md files (AI instructions, not project code)
+CLAUDE.md
+web/CLAUDE.md
+
+# Root-level assets and files outside web/
+PoppyLoveLogo.png
+PoppyLoveLogoGrid.jpg
+PrettyInPink-desk.png
+PrettyInPink-hand.png
+PrettyInPinkNails.png
+
+# Claude memory / session data
+.claude/
